@@ -1,0 +1,15 @@
+#Test Files
+prototipo2.py
+prototipo2_bert.py
+agentic_system.py
+Disney456_modified.xlsx
+requirements2.txt
+
+#Virtual Environment
+AgentVENV/ 
+
+# Variables de entorno
+.env
+
+#Carpeta de salidas
+salidas/

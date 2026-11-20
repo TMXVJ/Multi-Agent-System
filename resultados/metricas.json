@@ -1,0 +1,56 @@
+{
+  "n_train": 121,
+  "n_val": 26,
+  "n_test": 27,
+  "hiperparametros": {
+    "epocas": 30,
+    "lr": 0.0003,
+    "max_len": 128,
+    "seed": 42,
+    "modelo_base": "prajjwal1/bert-tiny"
+  },
+  "test": [
+    {
+      "modelo": "BERT tiny (fine-tuned)",
+      "accuracy": 0.7407,
+      "f1_macro": 0.7333,
+      "confianza_media": 0.6622
+    },
+    {
+      "modelo": "TF-IDF + LogReg (baseline)",
+      "accuracy": 0.8148,
+      "f1_macro": 0.8131,
+      "confianza_media": 0.5449
+    }
+  ],
+  "externo": [
+    {
+      "modelo": "BERT tiny (fine-tuned)",
+      "accuracy": 0.75,
+      "f1_macro": 0.75,
+      "confianza_media": 0.6151
+    },
+    {
+      "modelo": "TF-IDF + LogReg (baseline)",
+      "accuracy": 1.0,
+      "f1_macro": 1.0,
+      "confianza_media": 0.6996
+    }
+  ],
+  "latencia_ms_por_correo": {
+    "bert_tiny": 5.03,
+    "tfidf_logreg": 1.35,
+    "parametros_bert": 4386436
+  },
+  "cv": {
+    "folds": 5,
+    "bert_tiny": {
+      "accuracy": "0.811 ± 0.037",
+      "f1_macro": "0.806 ± 0.039"
+    },
+    "tfidf_logreg": {
+      "accuracy": "0.885 ± 0.040",
+      "f1_macro": "0.884 ± 0.044"
+    }
+  }
+}
