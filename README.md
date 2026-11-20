@@ -1,10 +1,9 @@
 # Sistema Multiagente Basado en Inteligencia Artificial para Automatizacion Administrativa
 
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Architecture](https://img.shields.io/badge/architecture-Multi--Agent%20System-orange.svg)](#arquitectura-del-sistema)
 
-Sistema multiagente desarrollado en Python para la automatizacion, clasificacion semantica y procesamiento de tareas administrativas. El proyecto implementa un modelo de lenguaje pequeno (SLM) ajustado mediante fine-tuning, tecnicas de procesamiento de lenguaje natural (NLP), consolidacion automatizada de hojas de calculo y sintesis de documentos PDF.
+Sistema multiagente desarrollado en Python para la automatizacion, clasificacion semantica y procesamiento de tareas administrativas. El proyecto implementa un modelo de lenguaje pequeo (SLM) ajustado mediante fine-tuning, tecnicas de procesamiento de lenguaje natural (NLP), consolidacion automatizada de hojas de calculo y sintesis de documentos PDF.
 
 ---
 
@@ -47,6 +46,7 @@ Supervisor Central (Enrutador de Intenciones TF-IDF + Regresion Logistica)
       +---> Agente Organizador (Extraccion, clasificacion y generacion de PDF resumen)
 
 El sistema sigue un patrón de **Orquestación Centralizada (Supervisor-Workers)**:
+```
 
 ```mermaid
 flowchart TD
@@ -62,7 +62,6 @@ flowchart TD
     AgentDocs --> ResDocs[(Salida: Archivo Organizado + PDF Resumen)]
 ```
 ```
-
 1. **Supervisor:** Recibe la instruccion en lenguaje natural del usuario, determina que tarea se requiere y la delega a la herramienta correspondiente.
 2. **Agente Clasificador:** Procesa el texto de correos electronicos (manualmente o extrayendolos por IMAP) y los cataloga en: Facturacion, Soporte Tecnico, Recursos Humanos, Ventas o Notificaciones.
 3. **Agente de Reportes:** Lee multiples archivos de Excel, unifica su estructura, limpia los datos y genera un libro de calculo consolidado con metricas estadisticas.
