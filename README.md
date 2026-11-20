@@ -1,212 +1,214 @@
-# Sistema Multiagente Basado en Inteligencia Artificial para Automatizacion Administrativa
+# Artificial Intelligence Multi-Agent System for Administrative Automation
 
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
-[![Architecture](https://img.shields.io/badge/architecture-Multi--Agent%20System-orange.svg)](#arquitectura-del-sistema)
+[![Architecture](https://img.shields.io/badge/architecture-Multi--Agent%20System-orange.svg)](#system-architecture)
 
-Sistema multiagente desarrollado en Python para la automatizacion, clasificacion semantica y procesamiento de tareas administrativas. El proyecto implementa un modelo de lenguaje pequeo (SLM) ajustado mediante fine-tuning, tecnicas de procesamiento de lenguaje natural (NLP), consolidacion automatizada de hojas de calculo y sintesis de documentos PDF.
-
----
-
-## Tabla de Contenidos
-
-- [Descripcion General](#descripcion-general)
-- [Arquitectura del Sistema](#arquitectura-del-sistema)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Requisitos Previos](#requisitos-previos)
-- [Instalacion y Configuracion](#instalacion-y-configuracion)
-- [Guia de Uso](#guia-de-uso)
-- [Modulos y Agentes](#modulos-y-agentes)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Licencia](#licencia)
+Multi-agent system developed in Python for the automation, semantic classification, and processing of administrative tasks. The project implements a fine-tuned small language model (SLM), natural language processing (NLP) techniques, automated spreadsheet consolidation, and PDF document synthesis.
 
 ---
 
-## Descripcion General
+## Table of Contents
 
-El objetivo de este proyecto es reducir la carga operativa en tareas administrativas recurrentes mediante la coordinacion de agentes de software especializados. 
-
-A diferencia de soluciones que dependen exclusivamente de APIs comerciales externas de gran escala, este sistema prioriza el uso de modelos locales compactos y eficientes (BERT-tiny), garantizando rapidez de inferencia, bajo consumo de recursos computacionales y mayor privacidad sobre la informacion procesada.
+- [General Description](#general-description)
+- [System Architecture](#system-architecture)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation and Configuration](#installation-and-configuration)
+- [Usage Guide](#usage-guide)
+- [Modules and Agents](#modules-and-agents)
+- [Technologies Used](#technologies-used)
+- [License](#license)
 
 ---
 
-## Arquitectura del Sistema
+## General Description
 
-El sistema implementa un patron de orquestacion jerarquica (Supervisor-Trabajadores):
+The objective of this project is to reduce operational workload in recurrent administrative tasks through the coordination of specialized software agents.
+
+Unlike solutions that rely exclusively on large-scale external commercial APIs, this system prioritizes the use of compact and efficient local models (BERT-tiny), ensuring fast inference, low computational resource consumption, and greater privacy over processed data.
+
+---
+
+## System Architecture
+
+The system implements a hierarchical orchestration pattern (Supervisor-Workers):
 
 ```
-Usuario (CLI)
+User (CLI)
       |
       v
-Supervisor Central (Enrutador de Intenciones TF-IDF + Regresion Logistica)
+Central Supervisor (TF-IDF Intent Router + Logistic Regression)
       |
-      +---> Agente Clasificador (BERT-tiny fine-tuned / IMAP)
+      +---> Classifier Agent (Fine-tuned BERT-tiny / IMAP)
       |
-      +---> Agente de Reportes (Consolidacion y metricas en Excel)
+      +---> Reporting Agent (Consolidation and metrics in Excel)
       |
-      +---> Agente Organizador (Extraccion, clasificacion y generacion de PDF resumen)
-
-El sistema sigue un patrón de **Orquestación Centralizada (Supervisor-Workers)**:
+      +---> Organizing Agent (Extraction, classification, and summary PDF generation)
 ```
+
+The system follows a **Centralized Orchestration (Supervisor-Workers)** pattern:
 
 ```mermaid
 flowchart TD
-    User([Usuario / CLI]) --> Supervisor[Supervisor / Orquestador]
-    Supervisor --> Router{Clasificador de Intenciones\nTF-IDF + LogisticRegression}
+    User([User / CLI]) --> Supervisor[Supervisor / Orchestrator]
+    Supervisor --> Router{Intent Classifier\nTF-IDF + LogisticRegression}
     
-    Router -->|Intención: Correo| AgentEmail[Agente Clasificador de Correos\nBERT-tiny fine-tuned]
-    Router -->|Intención: Reportes| AgentReports[Agente de Reportes Excel\nPandas / OpenPyXL]
-    Router -->|Intención: Documentos| AgentDocs[Agente Organizador de PDFs\nPyPDF + ReportLab]
+    Router -->|Intent: Email| AgentEmail[Email Classifier Agent\nFine-tuned BERT-tiny]
+    Router -->|Intent: Reports| AgentReports[Excel Reporting Agent\nPandas / OpenPyXL]
+    Router -->|Intent: Documents| AgentDocs[PDF Organizing Agent\nPyPDF + ReportLab]
     
-    AgentEmail --> ResEmail[(Salida: Clasificación / IMAP)]
-    AgentReports --> ResReports[(Salida: Excel Consolidado)]
-    AgentDocs --> ResDocs[(Salida: Archivo Organizado + PDF Resumen)]
+    AgentEmail --> ResEmail[(Output: Classification / IMAP)]
+    AgentReports --> ResReports[(Output: Consolidated Excel)]
+    AgentDocs --> ResDocs[(Output: Organized File + Summary PDF)]
 ```
-```
-1. **Supervisor:** Recibe la instruccion en lenguaje natural del usuario, determina que tarea se requiere y la delega a la herramienta correspondiente.
-2. **Agente Clasificador:** Procesa el texto de correos electronicos (manualmente o extrayendolos por IMAP) y los cataloga en: Facturacion, Soporte Tecnico, Recursos Humanos, Ventas o Notificaciones.
-3. **Agente de Reportes:** Lee multiples archivos de Excel, unifica su estructura, limpia los datos y genera un libro de calculo consolidado con metricas estadisticas.
-4. **Agente Organizador:** Lee archivos PDF, extrae su contenido, determina su categoria, elabora una sintesis estructurada y crea un nuevo PDF ejecutivo con el reporte.
+
+1. **Supervisor:** Receives natural language instructions from the user, determines the required task, and delegates it to the corresponding tool.
+2. **Classifier Agent:** Processes email text (manually or by extracting them via IMAP) and classifies them into: Invoicing, Technical Support, Human Resources, Sales, or Notifications.
+3. **Reporting Agent:** Reads multiple Excel files, standardizes their structure, cleans data, and generates a consolidated spreadsheet with statistical metrics.
+4. **Organizing Agent:** Reads PDF files, extracts their content, determines their category, generates a structured summary, and creates a new executive PDF report.
 
 ---
 
-## Estructura del Proyecto
+## Project Structure
 
 ```text
 Ing-Software-agent/
-|-- entrenar_bert.py                  # Script de entrenamiento y fine-tuning de BERT-tiny
-|-- main.py                           # Punto de entrada interactivo por consola (CLI)
-|-- README.md                         # Documentacion principal del proyecto
-|-- requirements.txt                  # Dependencias del proyecto
+|-- entrenar_bert.py                  # BERT-tiny fine-tuning and training script
+|-- main.py                           # Interactive console entry point (CLI)
+|-- README.md                         # Main project documentation
+|-- requirements.txt                  # Project dependencies
 |
-|-- datos/                            # Datasets para entrenamiento y evaluacion
-|   |-- correos_etiquetados.csv       # Dataset principal de correos clasificados
-|   `-- correos_prueba_externa.csv    # Conjunto de prueba externa
+|-- datos/                            # Datasets for training and evaluation
+|   |-- correos_etiquetados.csv       # Main classified emails dataset
+|   `-- correos_prueba_externa.csv    # External test set
 |
 |-- modelos/
-|   `-- bert_tiny_correos/            # Pesos y tokenizador del modelo BERT-tiny ajustado
+|   `-- bert_tiny_correos/            # Fine-tuned BERT-tiny model weights and tokenizer
 |
-|-- resultados/                       # Evaluacion del entrenamiento del modelo
-|   |-- matriz_confusion_bert.png     # Grafica de matriz de confusion
-|   |-- metricas.json                 # Metricas de precision, recall y F1-score
-|   `-- reporte.txt                   # Reporte textual de clasificacion
+|-- resultados/                       # Model training evaluation
+|   |-- matriz_confusion_bert.png     # Confusion matrix plot
+|   |-- metricas.json                 # Precision, recall, and F1-score metrics
+|   `-- reporte.txt                   # Textual classification report
 |
-`-- src/                              # Codigo fuente modularizado
+`-- src/                              # Modularized source code
     |-- __init__.py
-    |-- config.py                     # Carga de configuracion y rutas globales
+    |-- config.py                     # Configuration and global path loader
     |
-    |-- supervisor/                   # Modulo de orquestacion
+    |-- supervisor/                   # Orchestration module
     |   |-- __init__.py
-    |   |-- clasificador_intencion.py # Clasificador de intenciones por NLP
-    |   `-- orquestador.py            # Supervisor y herramientas de enrutamiento
+    |   |-- clasificador_intencion.py # NLP intent classifier
+    |   `-- orquestador.py            # Supervisor and routing tools
     |
-    `-- agentes/                      # Implementacion de agentes especializados
+    `-- agentes/                      # Specialized agent implementations
         |-- __init__.py
-        |-- agente_clasificador.py    # Clasificacion de correos e integracion IMAP
-        |-- agente_reportes.py        # Procesamiento y consolidacion de Excel
-        `-- agente_organizador.py     # Analisis y generacion de PDFs con ReportLab
+        |-- agente_clasificador.py    # Email classification and IMAP integration
+        |-- agente_reportes.py        # Excel processing and consolidation
+        `-- agente_organizador.py     # PDF analysis and generation with ReportLab
 ```
-
-## Requisitos Previos
-
-- Python 3.10 o superior instalado en el sistema.
-- Entorno de terminal (PowerShell, Bash o CMD).
-- Para la lectura de correos reales via IMAP: una cuenta de correo con autenticacion por contrasena de aplicacion habilitada (Gmail, Outlook, etc.).
 
 ---
 
-## Instalacion y Configuracion
+## Prerequisites
 
-### 1. Clonar el repositorio
+- Python 3.10 or higher installed on the system.
+- Terminal environment (PowerShell, Bash, or CMD).
+- For reading real emails via IMAP: an email account with application password authentication enabled (Gmail, Outlook, etc.).
+
+---
+
+## Installation and Configuration
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/TMXVJ/Multi-Agent-System.git
 cd Ing-Software-agent
 ```
 
-### 2. Crear y activar el entorno virtual
+### 2. Create and activate the virtual environment
 
-En Windows (PowerShell):
+On Windows (PowerShell):
 ```powershell
 python -m venv AgentVENV
 .\AgentVENV\Scripts\activate
 ```
 
-En Linux o macOS:
+On Linux or macOS:
 ```bash
 python3 -m venv AgentVENV
 source AgentVENV/bin/activate
 ```
 
-### 3. Instalar dependencias
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Variables de entorno
+### 4. Environment variables
 
-Crea un archivo `.env` en la raiz del proyecto tomando como base el siguiente formato:
+Create a `.env` file in the root of the project based on the following template:
 
 ```ini
-HF_TOKEN=tu_token_opcional
-EMAIL_USER=tu_correo@gmail.com
-EMAIL_PASS=tu_contrasena_de_aplicacion
+HF_TOKEN=your_optional_token
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
 ```
 
 ---
 
-## Guia de Uso
+## Usage Guide
 
-Para iniciar el sistema interactivo, ejecuta:
+To start the interactive system, run:
 
 ```bash
 python main.py
 ```
 
-### Opciones de ejecucion:
+### Execution options:
 
-- **Modo demostracion (`demo`):** Ejecuta una bateria de pruebas predefinidas que evalua el funcionamiento de los tres agentes con datos de muestra.
-- **Consultas en lenguaje natural:** Escribe instrucciones libres en la consola. El supervisor identificara la intencion automaticamente. Ejemplos:
-  - *"Clasifica este correo: Estimado equipo, adjunto soporte de pago de la factura de este mes."*
-  - *"Revisa los correos recientes de mi bandeja de entrada."*
-  - *"Consolida los archivos de ventas que estan en la carpeta reportes."*
-  - *"Organiza este documento PDF y genera un resumen ejecutivo."*
-- **Salir (`salir`):** Finaliza la sesion de la consola interactiva.
+- **Demonstration mode (`demo`):** Runs a predefined test suite that evaluates the performance of the three agents with sample data.
+- **Natural language queries:** Type free-form instructions into the console. The supervisor will identify the intent automatically. Examples:
+  - *"Classify this email: Dear team, attached is the payment proof for this month's invoice."*
+  - *"Check recent unread emails in my inbox."*
+  - *"Consolidate sales files located in the reports folder."*
+  - *"Organize this PDF document and generate an executive summary."*
+- **Exit (`salir`):** Closes the interactive console session.
 
 ---
 
-## Modulos y Agentes
+## Modules and Agents
 
 ### Supervisor (src/supervisor)
-- **ClasificadorIntencion:** Utiliza representacion vectorial TF-IDF y un clasificador de Regresion Logistica entrenado con un corpus de comandos tipicos en espanol. Asigna cada peticion a la intencion correspondiente (correos, reportes o documentos).
-- **Orquestador:** Expone las funciones como herramientas y coordina la ejecucion retornando la respuesta al usuario.
+- **ClasificadorIntencion:** Uses TF-IDF vector representations and a Logistic Regression classifier trained on a corpus of typical commands in Spanish. Maps each request to its corresponding intent (emails, reports, or documents).
+- **Orquestador:** Exposes functions as tools and coordinates execution, returning responses to the user.
 
-### Agente Clasificador (src/agentes/agente_clasificador.py)
-- Emplea un modelo `prajjwal1/bert-tiny` con ajuste de parametros (fine-tuning) para clasificar texto en 5 categorias de negocio.
-- Incluye integracion con el protocolo IMAP (`imaplib`) para extraer y analizar correos no leidos directamente desde un servidor de correo electronico.
+### Classifier Agent (src/agentes/agente_clasificador.py)
+- Employs a fine-tuned `prajjwal1/bert-tiny` model to classify text into 5 business categories.
+- Includes integration with the IMAP protocol (`imaplib`) to extract and analyze unread emails directly from a mail server.
 
-### Agente de Reportes (src/agentes/agente_reportes.py)
-- Lee colecciones de archivos de hojas de calculo (`.xlsx`, `.xls`).
-- Consolida la informacion en un unico DataFrame, genera analisis estadisticos de variables numericas y distribuciones de frecuencias categoricas, y exporta el resultado en un nuevo archivo Excel con hojas separadas.
+### Reporting Agent (src/agentes/agente_reportes.py)
+- Reads collections of spreadsheet files (`.xlsx`, `.xls`).
+- Consolidates information into a single DataFrame, generates statistical analyses for numerical variables and categorical frequency distributions, and exports results into a new Excel workbook with dedicated sheets.
 
-### Agente Organizador (src/agentes/agente_organizador.py)
-- Extrae texto y metadatos de documentos PDF mediante `pypdf`.
-- Identifica la tematica y categoria administrativa del documento a traves de analisis de frecuencias y reglas semanticas.
-- Genera un documento PDF formal con el resumen del texto utilizando la biblioteca `reportlab`.
-
----
-
-## Tecnologias Utilizadas
-
-- **Lenguaje:** Python
-- **Modelos de Lenguaje y NLP:** Hugging Face Transformers, PyTorch, Scikit-learn
-- **Analisis de Datos:** Pandas, OpenPyXL
-- **Generacion y Lectura de Documentos:** ReportLab, PyPDF
-- **Protocolos de Red:** IMAP (imaplib, email)
-- **Gestion de Configuracion:** Python-dotenv
+### Organizing Agent (src/agentes/agente_organizador.py)
+- Extracts text and metadata from PDF documents using `pypdf`.
+- Identifies the document's subject and administrative category via frequency analysis and semantic rules.
+- Generates a formal PDF document containing the text summary using the `reportlab` library.
 
 ---
 
-## Licencia
+## Technologies Used
+
+- **Language:** Python
+- **Language Models and NLP:** Hugging Face Transformers, PyTorch, Scikit-learn
+- **Data Analysis:** Pandas, OpenPyXL
+- **Document Generation and Extraction:** ReportLab, PyPDF
+- **Network Protocols:** IMAP (imaplib, email)
+- **Configuration Management:** Python-dotenv
+
+---
+
+## License
 
 All Rights Reserved TMXVJ
