@@ -1,5 +1,9 @@
 # Sistema Multiagente Basado en Inteligencia Artificial para Automatizacion Administrativa
 
+[![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Architecture](https://img.shields.io/badge/architecture-Multi--Agent%20System-orange.svg)](#arquitectura-del-sistema)
+
 Sistema multiagente desarrollado en Python para la automatizacion, clasificacion semantica y procesamiento de tareas administrativas. El proyecto implementa un modelo de lenguaje pequeno (SLM) ajustado mediante fine-tuning, tecnicas de procesamiento de lenguaje natural (NLP), consolidacion automatizada de hojas de calculo y sintesis de documentos PDF.
 
 ---
@@ -41,6 +45,22 @@ Supervisor Central (Enrutador de Intenciones TF-IDF + Regresion Logistica)
       +---> Agente de Reportes (Consolidacion y metricas en Excel)
       |
       +---> Agente Organizador (Extraccion, clasificacion y generacion de PDF resumen)
+
+El sistema sigue un patrón de **Orquestación Centralizada (Supervisor-Workers)**:
+
+```mermaid
+flowchart TD
+    User([Usuario / CLI]) --> Supervisor[Supervisor / Orquestador]
+    Supervisor --> Router{Clasificador de Intenciones\nTF-IDF + LogisticRegression}
+    
+    Router -->|Intención: Correo| AgentEmail[Agente Clasificador de Correos\nBERT-tiny fine-tuned]
+    Router -->|Intención: Reportes| AgentReports[Agente de Reportes Excel\nPandas / OpenPyXL]
+    Router -->|Intención: Documentos| AgentDocs[Agente Organizador de PDFs\nPyPDF + ReportLab]
+    
+    AgentEmail --> ResEmail[(Salida: Clasificación / IMAP)]
+    AgentReports --> ResReports[(Salida: Excel Consolidado)]
+    AgentDocs --> ResDocs[(Salida: Archivo Organizado + PDF Resumen)]
+```
 ```
 
 1. **Supervisor:** Recibe la instruccion en lenguaje natural del usuario, determina que tarea se requiere y la delega a la herramienta correspondiente.
@@ -54,36 +74,38 @@ Supervisor Central (Enrutador de Intenciones TF-IDF + Regresion Logistica)
 
 ```text
 Ing-Software-agent/
-|-- main.py                          # Punto de entrada interactivo por consola (CLI)
-|-- requirements.txt                 # Dependencias del proyecto
-|-- .env                             # Variables de entorno y credenciales (local)
-|-- .env.example                     # Plantilla de variables de entorno
+|-- entrenar_bert.py                  # Script de entrenamiento y fine-tuning de BERT-tiny
+|-- main.py                           # Punto de entrada interactivo por consola (CLI)
+|-- README.md                         # Documentacion principal del proyecto
+|-- requirements.txt                  # Dependencias del proyecto
+|
+|-- datos/                            # Datasets para entrenamiento y evaluacion
+|   |-- correos_etiquetados.csv       # Dataset principal de correos clasificados
+|   `-- correos_prueba_externa.csv    # Conjunto de prueba externa
 |
 |-- modelos/
-|   `-- bert_tiny_correos/           # Pesos y tokenizador del modelo BERT-tiny ajustado
+|   `-- bert_tiny_correos/            # Pesos y tokenizador del modelo BERT-tiny ajustado
 |
-|-- salidas/                         # Directorio donde se almacenan los resultados
-|   |-- reportes/                    # Archivos Excel consolidados
-|   |-- organizados/                 # Documentos originales clasificados por carpeta
-|   `-- resumenes_pdf/               # PDFs ejecutivos generados con el resumen
+|-- resultados/                       # Evaluacion del entrenamiento del modelo
+|   |-- matriz_confusion_bert.png     # Grafica de matriz de confusion
+|   |-- metricas.json                 # Metricas de precision, recall y F1-score
+|   `-- reporte.txt                   # Reporte textual de clasificacion
 |
-`-- src/                             # Codigo fuente modularizado
+`-- src/                              # Codigo fuente modularizado
     |-- __init__.py
-    |-- config.py                    # Carga de configuracion y rutas globales
+    |-- config.py                     # Carga de configuracion y rutas globales
     |
-    |-- supervisor/                  # Modulo de orquestacion
+    |-- supervisor/                   # Modulo de orquestacion
     |   |-- __init__.py
-    |   |-- clasificador_intencion.py# Clasificador de intenciones por NLP
-    |   `-- orquestador.py           # Supervisor y herramientas de enrutamiento
+    |   |-- clasificador_intencion.py # Clasificador de intenciones por NLP
+    |   `-- orquestador.py            # Supervisor y herramientas de enrutamiento
     |
-    `-- agentes/                     # Implementacion de agentes especializados
+    `-- agentes/                      # Implementacion de agentes especializados
         |-- __init__.py
-        |-- agente_clasificador.py   # Clasificacion de correos e integracion IMAP
-        |-- agente_reportes.py       # Procesamiento y consolidacion de Excel
-        `-- agente_organizador.py    # Analisis y generacion de PDFs con ReportLab
+        |-- agente_clasificador.py    # Clasificacion de correos e integracion IMAP
+        |-- agente_reportes.py        # Procesamiento y consolidacion de Excel
+        `-- agente_organizador.py     # Analisis y generacion de PDFs con ReportLab
 ```
-
----
 
 ## Requisitos Previos
 
@@ -98,7 +120,7 @@ Ing-Software-agent/
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/tu-repositorio.git
+git clone https://github.com/TMXVJ/Multi-Agent-System.git
 cd Ing-Software-agent
 ```
 
@@ -188,4 +210,4 @@ python main.py
 
 ## Licencia
 
-Este proyecto esta bajo la Licencia MIT. Consulta el archivo LICENSE para mas informacion.
+All Rights Reserved TMXVJ
